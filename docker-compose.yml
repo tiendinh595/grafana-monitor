@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:v0.39.0
+        container_name: cadvisor
+        restart: always
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+
+    node-exporter:
+        image: prom/node-exporter:v1.1.2
+        container_name: node-exporter
+        restart: always
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.sysfs=/host/sys'
+            - '--path.rootfs=/rootfs'
+            - "--collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'"
+
+    prometheus:
+        image: prom/prometheus:v2.26.0
+        container_name: prometheus
+        restart: always
+        ports:
+            - 9090:9090
+        volumes:
+            - ./config:/etc/prometheus/
+            - prometheus-data:/prometheus
+        depends_on:
+            - cadvisor
+
+    grafana:
+        image: grafana/grafana
+        container_name: grafana
+        restart: always
+        volumes:
+            - grafana-data:/var/lib/grafana
+        ports:
+            - 3000:3000
+        depends_on:
+            - prometheus
