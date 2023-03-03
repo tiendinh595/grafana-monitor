@@ -2,7 +2,7 @@ version: '3'
 
 services:
     cadvisor:
-        image: gcr.io/cadvisor/cadvisor:v0.39.0
+        image: gcr.io/cadvisor/cadvisor
         container_name: cadvisor
         restart: always
         volumes:
@@ -12,7 +12,7 @@ services:
             - /var/lib/docker/:/var/lib/docker:ro
 
     node-exporter:
-        image: prom/node-exporter:v1.1.2
+        image: prom/node-exporter
         container_name: node-exporter
         restart: always
         volumes:
@@ -26,7 +26,7 @@ services:
             - "--collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'"
 
     prometheus:
-        image: prom/prometheus:v2.26.0
+        image: prom/prometheus
         container_name: prometheus
         restart: always
         ports:
